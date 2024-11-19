@@ -77,7 +77,9 @@ func (x *XmlData) Parse(file *os.File) error {
 		return err
 	}
 
-	fmt.Printf("%#v", x)
+	bI, _ := xml.MarshalIndent(x, "", " ")
+	fmt.Println(string(bI))
+
 	return nil
 }
 
@@ -88,6 +90,9 @@ func (j *JsonData) Parse(file *os.File) error {
 	if err != nil {
 		return err
 	}
+
+	bI, _ := json.MarshalIndent(j, "", " ")
+	fmt.Println(string(bI))
 
 	return nil
 }
