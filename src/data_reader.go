@@ -6,33 +6,34 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 var (
 	FFlag = flag.String("f", "", "Read xml or json file")
 )
 
-type DBReader interface {
-	ExtractData()
+type FileParser interface {
+	Parse(file *os.File) error
 }
 
 type XmlData struct {
 	XMLName xml.Name `xml:"recipes"`
-	cake    []Cake   `xml:"cake"`
+	Cake    []Cake   `xml:"cake"`
 }
 
 type Cake struct {
 	XMLName     xml.Name      `xml:"cake"`
-	name        string        `xml:"name"`
-	stovetime   string        `xml:"stovetime"`
-	ingredients []Ingredients `xml:"ingredients"`
+	Name        string        `xml:"name"`
+	Stovetime   string        `xml:"stovetime"`
+	Ingredients []Ingredients `xml:"ingredients"`
 }
 
 type Ingredients struct {
 	XMLName xml.Name `xml:"ingredients"`
-	name    string   `xml:"itemname"`
-	count   float32  `xml:"itemcount"`
-	unit    string   `xml:"itemunit"`
+	Name    string   `xml:"itemname"`
+	Count   float32  `xml:"itemcount"`
+	Unit    string   `xml:"itemunit"`
 }
 
 type JsonData struct {
@@ -40,8 +41,48 @@ type JsonData struct {
 	ingridients      []string
 }
 
-func (x XmlData) ExtractData() {
-	XmlFile, err := os.Open(*FFlag)
+func (x *XmlData) Parse(file *os.File) error {
+
+	byteValue, _ := io.ReadAll(file)
+	err := xml.Unmarshal(byteValue, &x)
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%#v", x)
+	return nil
+}
+
+func (j *JsonData) Parse(file *os.File) error {
+	return nil
+}
+
+func DetectFileType(file *os.File) (FileParser, error) {
+	reader := io.NewSectionReader(file, 0, 512)
+	peek := make([]byte, 512)
+	_, err := reader.Read(peek)
+
+	if err != nil && err != io.EOF {
+		return nil, err
+	}
+
+	content := strings.TrimSpace(string(peek))
+
+	if strings.HasPrefix(content, "{") || strings.HasPrefix(content, "[") {
+		return &JsonData{}, nil
+
+	} else if strings.HasPrefix(content, "<") || strings.HasPrefix(content, "<?xml") {
+		return &XmlData{}, nil
+	}
+
+	return nil, fmt.Errorf("Unknown file type")
+}
+
+func main() {
+	flag.Parse()
+
+	File, err := os.Open(*FFlag)
 
 	if err != nil {
 		fmt.Println(err)
@@ -49,23 +90,26 @@ func (x XmlData) ExtractData() {
 	}
 
 	fmt.Printf("\nFile opened\n")
-	defer XmlFile.Close()
+	defer File.Close()
 
-	byteValue, _ := io.ReadAll(XmlFile)
-	err = xml.Unmarshal(byteValue, &x)
+	parser, err := DetectFileType(File)
 
 	if err != nil {
-		fmt.Printf("[Error]: %v\n", err)
+		fmt.Printf("[Error] Detecting file: %v\n", err)
 		return
 	}
 
-	fmt.Printf("%#v", x)
-}
+	_, err = File.Seek(0, io.SeekStart)
 
-func main() {
-	flag.Parse()
+	if err != nil {
+		fmt.Printf("[Error] Resetting file: %v\n", err)
+		return
+	}
 
-	fmt.Print("File: ", *FFlag)
-	data := new(XmlData)
-	data.ExtractData()
+	err = parser.Parse(File)
+
+	if err != nil {
+		fmt.Printf("[Error] Parsing file: %v\n", err)
+		return
+	}
 }
