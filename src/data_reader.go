@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"fmt"
@@ -13,36 +14,62 @@ var (
 	FFlag = flag.String("f", "", "Read xml or json file")
 )
 
-type FileParser interface {
+type DBReader interface {
 	Parse(file *os.File) error
 }
 
 type XmlData struct {
-	XMLName xml.Name `xml:"recipes"`
-	Cake    []Cake   `xml:"cake"`
+	XMLName xml.Name  `xml:"recipes"`
+	Cake    []XmlCake `xml:"cake"`
 }
 
-type Cake struct {
-	XMLName     xml.Name      `xml:"cake"`
-	Name        string        `xml:"name"`
-	Stovetime   string        `xml:"stovetime"`
-	Ingredients []Ingredients `xml:"ingredients"`
+type XmlCake struct {
+	XMLName     xml.Name         `xml:"cake"`
+	Name        string           `xml:"name"`
+	Stovetime   string           `xml:"stovetime"`
+	Ingredients []XmlIngredients `xml:"ingredients"`
 }
 
-type Ingredients struct {
+type XmlIngredients struct {
 	XMLName xml.Name `xml:"ingredients"`
 	Name    string   `xml:"itemname"`
-	Count   float32  `xml:"itemcount"`
+	Count   string   `xml:"itemcount"`
 	Unit    string   `xml:"itemunit"`
 }
 
 type JsonData struct {
-	name, stove_time string
-	ingridients      []string
+	Cake []JsonCake `json:"cake"`
+}
+
+type JsonCake struct {
+	Name        string            `json:"name"`
+	Time        string            `json:"time"`
+	Ingredients []JsonIngredients `json:"ingredients"`
+}
+
+type JsonIngredients struct {
+	Name  string `json:"ingredient_name"`
+	Count string `json:"ingredient_count"`
+	Unit  string `json:"ingredient_unit"`
+}
+
+type CommonData struct {
+	data []Cake
+}
+
+type Cake struct {
+	name        string
+	time        string
+	ingredients []Ingredients
+}
+
+type Ingredients struct {
+	name  string
+	count string
+	unit  string
 }
 
 func (x *XmlData) Parse(file *os.File) error {
-
 	byteValue, _ := io.ReadAll(file)
 	err := xml.Unmarshal(byteValue, &x)
 
@@ -55,10 +82,17 @@ func (x *XmlData) Parse(file *os.File) error {
 }
 
 func (j *JsonData) Parse(file *os.File) error {
+	byteValue, _ := io.ReadAll(file)
+	err := json.Unmarshal(byteValue, &j)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func DetectFileType(file *os.File) (FileParser, error) {
+func DetectFileType(file *os.File) (DBReader, error) {
 	reader := io.NewSectionReader(file, 0, 512)
 	peek := make([]byte, 512)
 	_, err := reader.Read(peek)
