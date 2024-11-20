@@ -1,14 +1,13 @@
 package main
 
 import (
+	"data_processing/src/reader"
 	"encoding/json"
 	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
 	"os"
-
-	"data_processing/src/reader"
 )
 
 var (
@@ -45,26 +44,17 @@ func main() {
 		return
 	}
 
-	_, err = File.Seek(0, io.SeekStart)
-
-	if err != nil {
+	if _, err = File.Seek(0, io.SeekStart); err != nil {
 		fmt.Printf("[Error] Resetting file: %v\n", err)
 		return
 	}
 
-	err = parser.Parse(File)
+	out := reader.FileReader(parser, File)
 
-	if err != nil {
-		fmt.Printf("[Error] Parsing file: %v\n", err)
-		return
-	}
-
-	out, file_type := parser.ToCommon()
-
-	if file_type == "json" {
+	if _, ok := parser.(*reader.XmlData); ok {
 		PrettyPrintXml(out)
 
-	} else if file_type == "xml" {
+	} else {
 		PrettyPrintJson(out)
 	}
 }

@@ -13,19 +13,15 @@ type XmlData struct {
 	Cake    []data.XmlCake `xml:"cake"`
 }
 
-func (x *XmlData) Parse(file *os.File) error {
+func (x *XmlData) Parse(file *os.File) (*CommonData, error) {
 	byteValue, _ := io.ReadAll(file)
 	err := xml.Unmarshal(byteValue, &x)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
-}
-
-func (x *XmlData) ToCommon() (CommonData, string) {
-	var common CommonData
+	common := &CommonData{}
 
 	for _, c := range x.Cake {
 		var ingredients []data.Ingredients
@@ -45,5 +41,5 @@ func (x *XmlData) ToCommon() (CommonData, string) {
 		})
 	}
 
-	return common, string("xml")
+	return common, nil
 }
