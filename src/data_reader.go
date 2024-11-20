@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"./reader"
+	"data_processing/src/reader"
 )
 
 var (

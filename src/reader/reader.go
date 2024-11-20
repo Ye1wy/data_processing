@@ -3,7 +3,7 @@ package reader
 import (
 	"os"
 
-	"./../data"
+	"data_processing/src/data"
 )
 
 type CommonData struct {

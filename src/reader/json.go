@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"./../data"
+	"data_processing/src/data"
 )
 
 type JsonData struct {
