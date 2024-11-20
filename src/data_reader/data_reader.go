@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	FFlag = flag.String("f", "", "Read xml or json file")
+	FFlag = flag.String("f", "nothing", "Read xml or json file")
 )
 
 func PrettyPrintJson(data interface{}) {
@@ -26,6 +26,11 @@ func PrettyPrintXml(data interface{}) {
 
 func main() {
 	flag.Parse()
+
+	if *FFlag == "nothing" {
+		fmt.Println("Did nothing! Be better my dear l*ser... *kxm* User!")
+		return
+	}
 
 	File, err := os.Open(*FFlag)
 
@@ -49,12 +54,19 @@ func main() {
 		return
 	}
 
-	out := reader.FileReader(parser, File)
+	err = parser.Parse(File)
+
+	if err != nil {
+		fmt.Printf("[Error] Parsing file: %v\n", err)
+		return
+	}
+
+	out := parser.ToCommon()
 
 	if _, ok := parser.(*reader.XmlData); ok {
-		PrettyPrintXml(out)
+		PrettyPrintJson(out)
 
 	} else {
-		PrettyPrintJson(out)
+		PrettyPrintXml(out)
 	}
 }
