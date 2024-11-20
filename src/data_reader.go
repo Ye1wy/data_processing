@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"encoding/xml"
 	"flag"
 	"fmt"
 	"io"
@@ -12,6 +14,16 @@ import (
 var (
 	FFlag = flag.String("f", "", "Read xml or json file")
 )
+
+func PrettyPrintJson(data interface{}) {
+	json_data, _ := json.MarshalIndent(data, "", "    ")
+	fmt.Println(string(json_data))
+}
+
+func PrettyPrintXml(data interface{}) {
+	xml_data, _ := xml.MarshalIndent(data, "", "    ")
+	fmt.Println(string(xml_data))
+}
 
 func main() {
 	flag.Parse()
@@ -45,5 +57,14 @@ func main() {
 	if err != nil {
 		fmt.Printf("[Error] Parsing file: %v\n", err)
 		return
+	}
+
+	out, file_type := parser.ToCommon()
+
+	if file_type == "json" {
+		PrettyPrintXml(out)
+
+	} else if file_type == "xml" {
+		PrettyPrintJson(out)
 	}
 }

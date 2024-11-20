@@ -2,7 +2,6 @@ package reader
 
 import (
 	"encoding/xml"
-	"fmt"
 	"io"
 	"os"
 
@@ -22,19 +21,16 @@ func (x *XmlData) Parse(file *os.File) error {
 		return err
 	}
 
-	bI, _ := xml.MarshalIndent(x, "", " ")
-	fmt.Println(string(bI))
-
 	return nil
 }
 
-func (x *XmlData) ToCommon() CommonData {
+func (x *XmlData) ToCommon() (CommonData, string) {
 	var common CommonData
 
 	for _, c := range x.Cake {
 		var ingredients []data.Ingredients
 
-		for _, i := range c.Ingredients {
+		for _, i := range c.Ingredients.Item {
 			ingredients = append(ingredients, data.Ingredients{
 				Name:  i.Name,
 				Count: i.Count,
@@ -42,12 +38,12 @@ func (x *XmlData) ToCommon() CommonData {
 			})
 		}
 
-		common.data = append(common.data, data.Cake{
+		common.Data = append(common.Data, data.Cake{
 			Name:        c.Name,
 			Time:        c.Stovetime,
 			Ingredients: ingredients,
 		})
 	}
 
-	return common
+	return common, string("xml")
 }

@@ -2,7 +2,6 @@ package reader
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 
@@ -21,13 +20,10 @@ func (j *JsonData) Parse(file *os.File) error {
 		return err
 	}
 
-	bI, _ := json.MarshalIndent(j, "", " ")
-	fmt.Println(string(bI))
-
 	return nil
 }
 
-func (j *JsonData) ToCommon() CommonData {
+func (j *JsonData) ToCommon() (CommonData, string) {
 	var common CommonData
 
 	for _, c := range j.Cake {
@@ -41,12 +37,12 @@ func (j *JsonData) ToCommon() CommonData {
 			})
 		}
 
-		common.data = append(common.data, data.Cake{
+		common.Data = append(common.Data, data.Cake{
 			Name:        c.Name,
 			Time:        c.Time,
 			Ingredients: ingredients,
 		})
 	}
 
-	return common
+	return common, string("json")
 }

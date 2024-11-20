@@ -1,7 +1,6 @@
 package reader
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -15,7 +14,7 @@ func DetectFileType(file *os.File) (DBReader, error) {
 		return nil, fmt.Errorf("[Error] Error reading file: %w\n", err)
 	}
 
-	if json.Valid(peek) {
+	if strings.HasPrefix(strings.TrimSpace(string(peek)), "{") {
 		return &JsonData{}, nil
 	}
 

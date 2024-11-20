@@ -7,10 +7,10 @@ import (
 )
 
 type CommonData struct {
-	data []data.Cake
+	Data []data.Cake `json:"cake" xml:"cake"`
 }
 
 type DBReader interface {
 	Parse(file *os.File) error
-	ToCommon() CommonData
+	ToCommon() (CommonData, string)
 }
