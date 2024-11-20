@@ -12,19 +12,23 @@ type JsonData struct {
 	Cake []data.JsonCake `json:"cake"`
 }
 
-func (j *JsonData) Parse(file *os.File) (*CommonData, error) {
+func (j *JsonData) Parse(file *os.File) error {
 	byteValue, err := io.ReadAll(file)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = json.Unmarshal(byteValue, &j)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
+	return nil
+}
+
+func (j *JsonData) ToCommon() *CommonData {
 	common := &CommonData{}
 
 	for _, c := range j.Cake {
@@ -45,5 +49,5 @@ func (j *JsonData) Parse(file *os.File) (*CommonData, error) {
 		})
 	}
 
-	return common, nil
+	return common
 }
