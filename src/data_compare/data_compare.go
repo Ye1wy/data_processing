@@ -1,10 +1,10 @@
 package main
 
 import (
+	"data_processing/src/compare"
 	"data_processing/src/reader"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -16,28 +16,60 @@ var (
 func main() {
 	flag.Parse()
 
-	File, err := os.Open(*OldFlag)
+	if *OldFlag == "nothing" || *NewFlag == "nothing" {
+		fmt.Println("[Error] Both --old and --new flags are required")
+		return
+	}
+
+	old_file, err := os.Open(*OldFlag)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Printf("\nFile opened\n")
-	defer File.Close()
+	defer old_file.Close()
 
-	parser, err := reader.DetectFileType(File)
+	parser, err := reader.ProcessFile(old_file)
 
 	if err != nil {
-		fmt.Printf("[Error] Detecting file: %v\n", err)
+		fmt.Printf("[Error] %v", err)
 		return
 	}
 
-	if _, err = File.Seek(0, io.SeekStart); err != nil {
-		fmt.Printf("[Error] Resetting file: %v\n", err)
+	err = parser.Parse(old_file)
+
+	if err != nil {
+		fmt.Printf("[Error] Parsing: %v\n", err)
 		return
 	}
 
-	out := parser.Parse(File)
+	old_data := parser.ToCommon()
 
+	new_file, err := os.Open(*NewFlag)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	defer new_file.Close()
+
+	parser, err = reader.ProcessFile(new_file)
+
+	if err != nil {
+		fmt.Printf("[Error] %v", err)
+		return
+	}
+
+	err = parser.Parse(new_file)
+
+	if err != nil {
+		fmt.Printf("[Error] Parsing: %v\n", err)
+		return
+	}
+
+	new_data := parser.ToCommon()
+
+	compare.DataCompare(old_data, new_data)
 }
