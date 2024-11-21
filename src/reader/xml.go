@@ -13,14 +13,14 @@ type XmlData struct {
 	Cake    []data.XmlCake `xml:"cake"`
 }
 
-func (x *XmlData) Parse(file *os.File) error {
+func (xml_data *XmlData) Parse(file *os.File) error {
 	byteValue, err := io.ReadAll(file)
 
 	if err != nil {
 		return err
 	}
 
-	err = xml.Unmarshal(byteValue, &x)
+	err = xml.Unmarshal(byteValue, &xml_data)
 
 	if err != nil {
 		return err
@@ -29,23 +29,23 @@ func (x *XmlData) Parse(file *os.File) error {
 	return nil
 }
 
-func (x *XmlData) ToCommon() *CommonData {
+func (xml_data *XmlData) ToCommon() *CommonData {
 	common := &CommonData{}
 
-	for _, c := range x.Cake {
+	for _, cake := range xml_data.Cake {
 		var ingredients []data.Ingredients
 
-		for _, i := range c.Ingredients.Item {
+		for _, ingredients_item := range cake.Ingredients.Item {
 			ingredients = append(ingredients, data.Ingredients{
-				Name:  i.Name,
-				Count: i.Count,
-				Unit:  i.Unit,
+				Name:  ingredients_item.Name,
+				Count: ingredients_item.Count,
+				Unit:  ingredients_item.Unit,
 			})
 		}
 
 		common.Data = append(common.Data, data.Cake{
-			Name:        c.Name,
-			Time:        c.Stovetime,
+			Name:        cake.Name,
+			Time:        cake.Stovetime,
 			Ingredients: ingredients,
 		})
 	}
