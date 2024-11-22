@@ -46,7 +46,7 @@ func main() {
 		return
 	}
 
-	new_data, err := reader.ReadLines(old_file)
+	new_data, err := reader.ReadLines(new_file)
 
 	if err != nil {
 		fmt.Printf("[Error] Scann filed: %v\n", err)
