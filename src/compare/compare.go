@@ -4,6 +4,8 @@ import (
 	"data_processing/src/data"
 	"data_processing/src/reader"
 	"fmt"
+	"slices"
+	"strings"
 )
 
 func DataCompare(old_data, new_data *reader.CommonData) {
@@ -80,4 +82,26 @@ func DataCompare(old_data, new_data *reader.CommonData) {
 			}
 		}
 	}
+}
+
+func FSCompare(data data.FSData) {
+	old_substrings := strings.Split(data.Old_file_data, "\n")
+	new_substrings := strings.Split(data.New_file_data, "\n")
+
+	for i := 0; i < len(old_substrings); i++ {
+		contained := slices.Contains(new_substrings, old_substrings[i])
+
+		if !contained {
+			fmt.Printf("REMOVED %s\n", old_substrings[i])
+		}
+	}
+
+	for i := 0; i < len(new_substrings); i++ {
+		contained := slices.Contains(old_substrings, new_substrings[i])
+
+		if !contained {
+			fmt.Printf("ADDED %s\n", new_substrings[i])
+		}
+	}
+
 }
