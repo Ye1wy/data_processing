@@ -1,5 +1,5 @@
 # About
-In this project, I wanted to try to create 3 programs:
+In this project, I wanted to try to create 3 programs on **golang**:
 1. A program that reads a file from Json and Xml through the implementation of the interface, which will also convert the read file from json to xml and back, to visually compare with an existing xml or json file
 2. A program that reads a file from json or xml, parses them, and then compares an existing json or xml file with the read one
 3. A program that reads a file from txt and compares an existing txt file
