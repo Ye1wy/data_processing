@@ -71,6 +71,10 @@ func DataCompare(old_data, new_data *reader.CommonData) {
 						fmt.Printf("REMOVED unit \"%s\" for ingredient \"%s\" for cake \"%s\"\n",
 							old_ing.Unit, ing_name, name)
 
+					} else if old_ing.Unit == "" && new_ing.Unit != "" {
+						fmt.Printf("ADDED unit \"%s\" for ingredient \"%s\" for cake \"%s\"\n",
+							new_ing.Unit, ing_name, name)
+
 					} else if old_ing.Unit != new_ing.Unit {
 						fmt.Printf("CHANGED unit for ingredient \"%s\" for cake \"%s\" - \"%s\" instead of \"%s\"\n",
 							ing_name, name, new_ing.Unit, old_ing.Unit)
