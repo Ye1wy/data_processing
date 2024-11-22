@@ -39,7 +39,19 @@ func main() {
 
 	defer new_file.Close()
 
-	data := reader.FSFileRead(old_file, new_file)
+	old_data, err := reader.ReadLines(old_file)
 
-	compare.FSCompare(data)
+	if err != nil {
+		fmt.Printf("[Error] Scann filed: %v\n", err)
+		return
+	}
+
+	new_data, err := reader.ReadLines(old_file)
+
+	if err != nil {
+		fmt.Printf("[Error] Scann filed: %v\n", err)
+		return
+	}
+
+	compare.FSCompare(old_data, new_data)
 }

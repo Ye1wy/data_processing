@@ -1,8 +1,7 @@
 package reader
 
 import (
-	"fmt"
-	"io"
+	"bufio"
 	"os"
 
 	"data_processing/src/data"
@@ -17,43 +16,13 @@ type DBReader interface {
 	ToCommon() *CommonData
 }
 
-func FSFileRead(old_file, new_file *os.File) data.FSData {
-	var data data.FSData
-	buf := make([]byte, 32*1024)
+func ReadLines(file *os.File) (map[string]struct{}, error) {
+	lines := make(map[string]struct{})
+	scanner := bufio.NewScanner(file)
 
-	for {
-		byteValue, err := old_file.Read(buf)
-
-		if byteValue > 0 {
-			data.Old_file_data += string(buf[:byteValue])
-		}
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			fmt.Printf("[Error]: Reading error: %v\n", err)
-			break
-		}
+	for scanner.Scan() {
+		lines[scanner.Text()] = struct{}{}
 	}
 
-	for {
-		byteValue, err := new_file.Read(buf)
-
-		if byteValue > 0 {
-			data.New_file_data += string(buf[:byteValue])
-		}
-
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			fmt.Printf("[Error]: Reading error: %v\n", err)
-			break
-		}
-	}
-
-	return data
+	return lines, scanner.Err()
 }

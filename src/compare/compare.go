@@ -4,8 +4,6 @@ import (
 	"data_processing/src/data"
 	"data_processing/src/reader"
 	"fmt"
-	"slices"
-	"strings"
 )
 
 func DataCompare(old_data, new_data *reader.CommonData) {
@@ -20,13 +18,13 @@ func DataCompare(old_data, new_data *reader.CommonData) {
 		new_cakes[cake.Name] = cake
 	}
 
-	for name, _ := range new_cakes {
+	for name := range new_cakes {
 		if _, exist := old_cakes[name]; !exist {
 			fmt.Printf("ADDED cake \"%s\"\n", name)
 		}
 	}
 
-	for name, _ := range old_cakes {
+	for name := range old_cakes {
 		if _, exist := new_cakes[name]; !exist {
 			fmt.Printf("REMOVED cake \"%s\"\n", name)
 		}
@@ -50,13 +48,13 @@ func DataCompare(old_data, new_data *reader.CommonData) {
 				new_ingredients[ing.Name] = ing
 			}
 
-			for ing_name, _ := range new_ingredients {
+			for ing_name := range new_ingredients {
 				if _, exist := old_ingredients[ing_name]; !exist {
 					fmt.Printf("ADDED ingredient \"%s\" for cake \"%s\"\n", ing_name, name)
 				}
 			}
 
-			for ing_name, _ := range old_ingredients {
+			for ing_name := range old_ingredients {
 				if _, exist := new_ingredients[ing_name]; !exist {
 					fmt.Printf("REMOVED ingredient \"%s\" for cake \"%s\"\n", ing_name, name)
 				}
@@ -84,24 +82,16 @@ func DataCompare(old_data, new_data *reader.CommonData) {
 	}
 }
 
-func FSCompare(data data.FSData) {
-	old_substrings := strings.Split(data.Old_file_data, "\n")
-	new_substrings := strings.Split(data.New_file_data, "\n")
-
-	for i := 0; i < len(old_substrings); i++ {
-		contained := slices.Contains(new_substrings, old_substrings[i])
-
-		if !contained {
-			fmt.Printf("REMOVED %s\n", old_substrings[i])
+func FSCompare(old_data, new_data map[string]struct{}) {
+	for key := range old_data {
+		if _, exist := new_data[key]; !exist {
+			fmt.Printf("REMOVED %s\n", key)
 		}
 	}
 
-	for i := 0; i < len(new_substrings); i++ {
-		contained := slices.Contains(old_substrings, new_substrings[i])
-
-		if !contained {
-			fmt.Printf("ADDED %s\n", new_substrings[i])
+	for key := range new_data {
+		if _, exist := old_data[key]; !exist {
+			fmt.Printf("ADDED %s\n", key)
 		}
 	}
-
 }
