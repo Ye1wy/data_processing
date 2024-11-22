@@ -41,8 +41,5 @@ func main() {
 
 	data := reader.FSFileRead(old_file, new_file)
 
-	fmt.Println(data.Old_file_data)
-	fmt.Println(data.New_file_data)
-
 	compare.FSCompare(data)
 }
