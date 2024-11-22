@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -40,10 +41,15 @@ func main() {
 
 	defer File.Close()
 
-	parser, err := reader.ProcessFile(File)
+	parser, err := reader.DetectFileType(File)
 
 	if err != nil {
-		fmt.Printf("[Error] %v", err)
+		fmt.Printf("[Error] %v\n", err)
+		return
+	}
+
+	if _, err = File.Seek(0, io.SeekStart); err != nil {
+		fmt.Printf("[Error] %v\n", err)
 		return
 	}
 

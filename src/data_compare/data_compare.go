@@ -5,6 +5,7 @@ import (
 	"data_processing/src/reader"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -30,10 +31,15 @@ func main() {
 
 	defer old_file.Close()
 
-	parser, err := reader.ProcessFile(old_file)
+	parser, err := reader.DetectFileType(old_file)
 
 	if err != nil {
-		fmt.Printf("[Error] %v", err)
+		fmt.Printf("[Error] %v\n", err)
+		return
+	}
+
+	if _, err = old_file.Seek(0, io.SeekStart); err != nil {
+		fmt.Printf("[Error] %v\n", err)
 		return
 	}
 
@@ -55,10 +61,15 @@ func main() {
 
 	defer new_file.Close()
 
-	parser, err = reader.ProcessFile(new_file)
+	parser, err = reader.DetectFileType(new_file)
 
 	if err != nil {
-		fmt.Printf("[Error] %v", err)
+		fmt.Printf("[Error] %v\n", err)
+		return
+	}
+
+	if _, err = new_file.Seek(0, io.SeekStart); err != nil {
+		fmt.Printf("[Error] %v\n", err)
 		return
 	}
 
