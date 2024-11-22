@@ -34,7 +34,7 @@ func DataCompare(old_data, new_data *reader.CommonData) {
 		if new_cake, exist := new_cakes[name]; exist {
 
 			if old_cake.Time != new_cake.Time {
-				fmt.Printf("CHANGED cooking time for cake \"%s\" - \"%s\" instead of \"%s\"\n", name, old_cake.Time, new_cake.Time)
+				fmt.Printf("CHANGED cooking time for cake \"%s\" - \"%s\" instead of \"%s\"\n", name, new_cake.Time, old_cake.Time)
 			}
 
 			old_ingredients := make(map[string]data.Ingredients)
